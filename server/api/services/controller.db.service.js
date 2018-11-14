@@ -1,7 +1,8 @@
 /* eslint-disable no-await-in-loop */
+import logger from '../../common/logger';
 import { GET_CUSTOMER_ZONE, GET_CUSTOMER_EMAIL, GET_CUSTOMER_PHONE } from '../sql/sql-sentences';
 
-class wrappService {
+class WrappService {
   async getCustomerData(instanceDb, orgId, custId) {
     let queryResult;
     let customerResponse;
@@ -11,26 +12,29 @@ class wrappService {
       const arr = queryResult.rows;
       if (arr.length > 0) {
         customerResponse = this.custAssemble(arr, instanceDb);
+        logger.info('De vuelta custAssemble');
       } else {
-        console.log('No hay datos disponibles para los parametros dados.');
+        logger.info('No hay datos disponibles para los parametros dados.');
+        customerResponse = {};
       }
     } catch (error) {
-      console.log('En el catch   -------------------');
-      console.log(error);
+      logger.warn('CATCH');
+      logger.error(error);
       // falta generar el objeto JSDON de error y enviarselo a res.
     }
     return customerResponse;
   }
 
   async custAssemble(rowsArray, instanceDb) {
-    console.log('Inicio desde custAssemble');
+    logger.info('Inicio desde custAssemble');
     const clienteZonaSalida = [];
     let queryMail1 = null;
     let queryPhone1 = null;
     let queryMail2 = null;
     let queryPhone2 = null;
-    // eslint-disable-next-line no-restricted-syntax
-    for (const element of rowsArray) {
+
+    for (let index = 0; index < rowsArray.length; index += 1) {
+      const element = rowsArray[index];
       const clientezona = {};
       clientezona.setid = element[0] || '';
       clientezona.cust_id = element[1] || '';
@@ -44,11 +48,11 @@ class wrappService {
           queryMail1 = await instanceDb.execute(GET_CUSTOMER_EMAIL, [orgId, teamId]);
           queryPhone1 = await instanceDb.execute(GET_CUSTOMER_PHONE, [orgId, teamId]);
           clientezona.name1 = element[6] || '';
-          clientezona.emailid2 = queryMail1.rows[0].toString() || '';
-          if (queryPhone1.rows[0] !== 'undefined' && queryPhone1.rows[1] !== 'undefined') {
-            clientezona.phone1 = queryPhone1.rows[1].toString() + queryPhone1.rows[0].toString() || '';
+          clientezona.emailid2 = (queryMail1.rows > 0) ? queryMail1.rows[0].toString() : '';
+          if (queryPhone1.rows.length > 0) {
+            clientezona.phone1 = queryPhone1.rows[1] || `${queryPhone1.rows[0]}` || '';
           } else {
-            clientezona.phone1 = queryPhone1.rows[0].toString() || '';
+            clientezona.phone1 = queryPhone1.rows[0] || '';
           }
           clientezona.support_team_mbr2 = '';
           clientezona.name2 = '';
@@ -63,20 +67,21 @@ class wrappService {
           clientezona.support_team_mbr2 = clientezona.support_team_mbr;
           clientezona.support_team_mbr = '';
           clientezona.name2 = element[6];
+          clientezona.emailid3 = (queryMail2.rows.length > 0) ? queryMail2.rows[0].toString() : '';
           clientezona.emailid3 = queryMail2.rows[0].toString() || '';
-          if (queryPhone2.rows[0] !== 'undefined' && queryPhone2.rows[1] !== 'undefined') {
-            clientezona.phone2 = queryPhone2.rows[1].toString() + queryPhone2.rows[0].toString() || '';
+          if (queryPhone2.rows.length > 0) {
+            clientezona.phone2 = queryPhone2.rows[1] || `${queryPhone2.rows[0]}` || '';
           } else {
-            clientezona.phone2 = queryPhone2.rows[0].toString();
+            clientezona.phone2 = queryPhone2.rows[0] || '';
           }
         }
       } catch (error) {
-        console.log(error);
+        logger.error(error);
       }
       clientezona.route_cd = element[7];
       clienteZonaSalida.push(clientezona);
     }
-    return Promise.resolve(clienteZonaSalida);
+    return clienteZonaSalida;
   }
 
   objectError(error) {
@@ -84,5 +89,5 @@ class wrappService {
   }
 }
 
-export default new wrappService();
+export default new WrappService();
 

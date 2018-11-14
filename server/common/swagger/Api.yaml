@@ -35,7 +35,7 @@ info:
 schemes:
   - https
 host: api.colcomercio.com.co
-basePath: /cliente/fabrica-credito/
+basePath: /cliente/fabrica-credito
 consumes:
   - application/json
 produces:
@@ -92,6 +92,13 @@ paths:
           required: true
           in: path
           description: Es el valor clienteId correspondiente al identificador de cliente.
+  /api-doc:
+    get:
+      tags:
+        - Specification
+      responses:
+        200:
+          description: Return the API specification
 definitions:
   ClienteZona:
     description: Datos de cliente en zona por organización

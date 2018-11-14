@@ -17,12 +17,13 @@ export class Controller {
         res.status(200).json(value);
       });
     } catch (error) {
-      console.log('Falla en la conexión a base de datos.', error);
+      logger.error('Falla en la conexión a base de datos.', error);
     } finally {
-      console.log('en finally   -------------------');
+      logger.info('****** En Finally ********');
       // if (instanceDb) {
       //   instanceDb.close();
       // }
+      // logger.info('Conexión cerrada');
     }
   }
 }
