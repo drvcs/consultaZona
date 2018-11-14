@@ -1,0 +1,87 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  namespace: prd
+  labels:
+    app: ck-consultazona
+    version: 1.0.0
+    environment: prd
+  name: ck-consultazona
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ck-consultazona
+      version: 1.0.0
+  template:
+    metadata:
+      labels:
+        app: ck-consultazona
+        version: 1.0.0
+        environment: prd
+      name: ck-consultazona
+    spec:
+      containers:
+      - env:
+        - name: APP
+          value: ck-consultazona
+        - name: HOST
+          value: localhost
+        - name: PORT
+          value: "80"
+        - name: DOCS
+          value: /sitidata/microservices/inquiry/docs
+        - name: ROUTE
+          value: /sitidata/microservices/inquiry
+        - name: TIMEOUT
+          value: "4000"
+        - name: SIZE_JSON
+          value: "50mb"
+        - name: ENVIRONMENT
+          value: "PRODUCCION"
+        - name: MAIL_URI
+          value: http://10.181.3.180:32470/utils/microservice/sendmail
+        - name: MAIL_TO
+          value: miguel.caro@colcomercio.com.co,jose.rojas@colcomercio.com.co
+        - name: URL_GEOCODER
+          value: http://sitidataws-colombiana-comercio.appspot.com/api/zonificador/geocoder/stdr/
+        - name: URL_GEOASSISTED
+          value: http://sitidataws-colombiana-comercio.appspot.com/api/geoassisted/stdr/
+        - name: MSG_200
+          value: La transaccion fue exitosa.
+        - name: MSG_201
+          value: El recurso ha sido creado.
+        - name: MSG_204
+          value: La transaccion fue exitosa, pero no contiene una respuesta.
+        - name: MSG_400
+          value: Los parametros suministrados no son validos.
+        - name: MSG_401
+          value: No esta autorizado.
+        - name: MSG_404
+          value: Peticion mal definida.
+        - name: MSG_408
+          value: El tiempo de espera se agoto.
+        - name: MSG_500
+          value: Ha ocurrido un error interno en el servidor.
+        - name: GEOSTATES
+          value: A,B,D,F,I,K,L,M,N,Y
+        image: registry.gitlab.com/alkosto/microservices/ck-consultazona:1.0.0
+        imagePullPolicy: IfNotPresent
+        name: ck-consultazona
+        ports:
+        - containerPort: 80
+          name: port-ck-consultazona
+          protocol: TCP
+        resources: {}
+        securityContext:
+          privileged: false
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+      dnsPolicy: ClusterFirst
+      imagePullSecrets:
+      - name: gitlab-registry-secret
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+status: {}

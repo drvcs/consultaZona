@@ -1,0 +1,176 @@
+swagger: '2.0'
+info:
+  x-ibm-name: ck-consultazona
+  title: ConsultaZona
+  version: 1.0.0
+  contact:
+    name: Dany Aldemar Sanchez Otalora (Ciclo cartera)
+    email: Dany.Sanchez@colcomercio.com.co
+  description: >-
+    # Objetivo del API REST
+
+    Servicio que consulta la zona de un cliente dados dos parámetros setid y
+    custid, entregando la información de cliente y zona.
+
+
+    ---
+
+    ### Justificación de Servicio
+      El servicio busca reemplazar el WebService ofrecido directamente por PeopleSoft, buscando mayor confiabilidad y estabilidad de la consulta.
+
+    ### Dueño de Servicio
+      El servicio es solicitado por el àrea de fabrica de crédito 
+
+    ----
+
+    ## Principios de Diseño
+
+    *Servicio REST API de ColComercio*
+
+      Este servicio adopta los lineamientos de diseño para los servicios REST de ColComercio, concretamente:
+       - Se ofrece contrato en formato OpenApi V2.0 http://swagger.io/
+       - La mensajería se describe como JSON adoptando JSON Schema: http://json-schema.org/
+       - La estructura de los mensajes adopta JSON API : http://jsonapi.org/
+  termsOfService: ColComercio
+schemes:
+  - https
+host: api.colcomercio.com.co
+basePath: /cliente/fabrica-credito/
+consumes:
+  - application/json
+produces:
+  - application/json
+securityDefinitions:
+  clientIdHeader:
+    type: apiKey
+    in: header
+    name: X-COLCO-Client-Id
+security:
+  - clientIdHeader: []
+x-ibm-configuration:
+  testable: true
+  enforced: true
+  cors:
+    enabled: true
+  assembly:
+    execute:
+      - invoke:
+          target-url: $(target-url)$(request.path)
+paths:
+  '/setid/{orgId}/clientes/{clienteId}':
+    get:
+      responses:
+        '200':
+          description: 200 OK
+          schema:
+            $ref: '#/definitions/ClienteZonaSalida'
+        '404':
+          description: Not Found No existen datos para este cliente-id y org-id
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/Errores'
+        '503':
+          description: 'Service Unavailable: Base de datos no responde'
+          schema:
+            $ref: '#/definitions/Error'
+      tags:
+        - cliente-zona
+      summary: Consulta de zona asociada a cliente para fabrica de credito
+      operationId: WS_CLIENTEZONA
+      description: Ejecuta consultas directas a las tablas de zona en PS
+      parameters:
+        - name: orgId
+          required: true
+          in: path
+          type: string
+          description: Es el valor setid correspondiente a organización.
+        - name: clienteId
+          type: string
+          required: true
+          in: path
+          description: Es el valor clienteId correspondiente al identificador de cliente.
+definitions:
+  ClienteZona:
+    description: Datos de cliente en zona por organización
+    type: object
+    properties:
+      org:
+        type: string
+        example: ALKOST
+      cliente-id:
+        type: string
+        example: 80145678978
+      nombre:
+        type: string
+        example: Pepe Cortisona
+      email:
+        type: string
+        example: pepe.cortisona@gmail.com
+      telefono:
+        type: string
+        example: 315-67896789
+      support-team-mbr:
+        type: string
+        example: CLIENIN
+      support-teamcd:
+        type: string
+        example: CARO11
+      esDefault:
+        type: boolean
+        example: true
+  ClienteZonaSalida:
+    properties:
+      meta:
+        type: object
+      data:
+        type: array
+        items:
+          $ref: '#/definitions/ClienteZona'
+      links:
+        $ref: '#/definitions/links'
+    additionalProperties: false
+    required:
+      - data
+    description: datos de cliente incluyendo zona
+  Error:
+    description: Indicador de Error en respuesta
+    type: object
+    properties:
+      error-id:
+        type: string
+        example: ORA-06501 Program Error
+      error-msg:
+        type: string
+        example: Falla en query a base de datos
+    additionalProperties: true
+  Errores:
+    type: array
+    items:
+      $ref: '#/definitions/Error'
+  links:
+    type: object
+    properties:
+      self:
+        type: string
+        example: >-
+          http://api.colcomercio.com.co/clientes/fabrica-credito/orgs/ALKOS/clientes/123?pag-num=3&pag-size=10
+      first:
+        type: string
+        example: >-
+          http://api.colcomercio.com.co/clientes/fabrica-credito/orgs/ALKOS/clientes/123?pag-num=1&pag-size=10
+      prev:
+        type: string
+        example: >-
+          http://api.colcomercio.com.co/clientes/fabrica-credito/orgs/ALKOS/clientes/123?pag-num=2&pag-size=10
+      next:
+        type: string
+        example: >-
+          http://api.colcomercio.com.co/clientes/fabrica-credito/orgs/ALKOS/clientes/123?pag-num=4&pag-size=10
+      last:
+        type: string
+        example: >-
+          http://api.colcomercio.com.co/clientes/fabrica-credito/orgs/ALKOS/clientes/123?pag-num=60&pag-size=10
+tags: []
