@@ -128,6 +128,21 @@ definitions:
       esDefault:
         type: boolean
         example: true
+      support_team_mbr2:
+        type: string
+        example: CAROFC
+      name2:
+        type: string
+        example: Pepe Cortisona
+      emailid3:
+        type: string
+        example: pepe.cortisona@gmail.com
+      phone2:
+        type: string
+        example: 315-67896789
+      route_cd:
+        type: string
+        example: 2
   ClienteZonaSalida:
     properties:
       meta:

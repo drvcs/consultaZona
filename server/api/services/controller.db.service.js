@@ -1,4 +1,3 @@
-/* eslint-disable no-await-in-loop */
 import logger from '../../common/logger';
 import { GET_CUSTOMER_ZONE, GET_CUSTOMER_EMAIL, GET_CUSTOMER_PHONE } from '../sql/sql-sentences';
 
@@ -28,6 +27,7 @@ class WrappService {
   async custAssemble(rowsArray, instanceDb) {
     logger.info('Inicio desde custAssemble');
     const clienteZonaSalida = [];
+    const promises = [];
     let queryMail1 = null;
     let queryPhone1 = null;
     let queryMail2 = null;
@@ -68,7 +68,6 @@ class WrappService {
           clientezona.support_team_mbr = '';
           clientezona.name2 = element[6];
           clientezona.emailid3 = (queryMail2.rows.length > 0) ? queryMail2.rows[0].toString() : '';
-          clientezona.emailid3 = queryMail2.rows[0].toString() || '';
           if (queryPhone2.rows.length > 0) {
             clientezona.phone2 = queryPhone2.rows[1] || `${queryPhone2.rows[0]}` || '';
           } else {
@@ -76,7 +75,7 @@ class WrappService {
           }
         }
       } catch (error) {
-        logger.error(error);
+        console.log(error);
       }
       clientezona.route_cd = element[7];
       clienteZonaSalida.push(clientezona);
